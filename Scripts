@@ -1,0 +1,53 @@
+from bs4 import BeautifulSoup as soup  # HTML data structure
+from urllib.request import urlopen as uReq  # Web client
+
+# The url which will be scrapped
+page_url = "https://www.amazon.com/gp/bestsellers/?ref_=nav_cs_bestsellers"
+
+# Open the connection
+uClient = uReq(page_url)
+
+# Use html to parse data into soup
+page_soup = soup(uClient.read(), "html.parser")
+uClient.close()
+uCli
+
+# Find the data 
+container = page_soup.find("div", {"class":"zg_item zg_homeWidgetItem"})
+
+# Creating a csv file to save the data to
+out_filename = "graphics_cards.csv"
+# header of csv file to be written
+headers = "brand,product_name,shipping \n"
+
+
+f = open(out_filename, "w")
+f.write(headers)
+
+# Loop over the items to be scraped . Pick  specific data using divs , a, and img tags
+for container in containers:
+    # From div -> a 
+    make_rating_sp = container.div.select("a")
+
+   
+    brand = make_rating_sp[0].img["title"].title()
+
+    # Grabs the text within the second "(a)" tag from within
+ 
+    product_name = container.div.select("a")[2].text
+
+    # Grabs the product shipping information by searching
+    # all lists with the class "price-ship".
+    # Then cleans the text of white space with strip()
+    # Cleans the strip of "Shipping $" if it exists to just get number
+    shipping = container.findAll("li", {"class": "price-ship"})[0].text.strip().replace("$", "").replace(" Shipping", "")
+
+   
+    print("brand: " + brand + "\n")
+    print("product_name: " + product_name + "\n")
+    print("shipping: " + shipping + "\n")
+
+    # Add the data to the file
+    f.write(brand + ", " + product_name.replace(",", "|") + ", " + shipping + "\n")
+
+f.close()  
